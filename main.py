@@ -129,5 +129,46 @@ def matricular():
     guardar_estudiantes(estudiantes)
 
     print("Matricula registrada correctamente.")
+def trasladar():
+    estudiantes = cargar_estudiantes()
+
+    print("\n=== TRASLADO DE ESTUDIANTE ===")
+
+    dni = pedir_dni()
+    estudiante = buscar_recursivo(estudiantes, dni)
+
+    if estudiante is None:
+        print("No se encontro al estudiante.")
+        return
+
+    if estudiante["estado"] != "Matriculado":
+        print("El estudiante no se encuentra matriculado.")
+        return
+
+    print("\nDatos del estudiante:")
+    print("Nombre:", estudiante["nombres"], estudiante["apellidos"])
+    print("Grado:", estudiante["grado"])
+    print("Seccion:", estudiante["seccion"])
+
+    destino = pedir_texto("Institucion de destino: ").title()
+
+    fecha = datetime.now().strftime("%d/%m/%Y")
+
+    registro = {
+        "fecha": fecha,
+        "institucion_destino": destino,
+        "estado_anterior": estudiante["estado"],
+        "estado_nuevo": "Trasladado"
+    }
+
+    estudiante["traslados"].append(registro)
+    estudiante["estado"] = "Trasladado"
+
+    guardar_estudiantes(estudiantes)
+
+    print("\nTraslado registrado correctamente.")
+    print("Destino:", destino)
+    print("Fecha:", fecha)
+    print("Estado actualizado a: Trasladado")
 if __name__ == "__main__":
     matricular()
