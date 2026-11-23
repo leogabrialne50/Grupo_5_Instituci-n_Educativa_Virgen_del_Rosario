@@ -4,12 +4,12 @@ Sistema de consola para gestionar estudiantes de la I.E. Virgen del Rosario - Pi
 
 ## Archivos por integrante
 
-- `validaciones.py`: validación de datos (Integrante 1).
-- `almacenamiento.py`: lectura y escritura del archivo JSON (Integrante 2).
-- `consultas.py`: búsqueda, listado, ordenamiento y promedios (Integrante 3).
-- `operaciones.py`: matrícula, registro de notas y traslados (Integrante 4).
-- `main.py`: menú principal e integración de módulos (Integrante 5).
-- `pruebas.py`: pruebas automatizadas del sistema (Integrante 5).
+- `validaciones.py`: validación de datos (JEAN).
+- `almacenamiento.py`: lectura y escritura del archivo JSON (LEONARDO).
+- `consultas.py`: búsqueda, listado, ordenamiento y promedios (SARA).
+- `operaciones.py`: matrícula, registro de notas y traslados (ANAYELI).
+- `main.py`: menú principal e integración de módulos (MARLON).
+- `pruebas.py`: pruebas automatizadas del sistema (MARLONX2).
 
 ## Requisitos
 
