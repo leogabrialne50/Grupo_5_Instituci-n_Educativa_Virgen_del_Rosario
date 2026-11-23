@@ -2,116 +2,119 @@ from datetime import datetime
 
 
 
-def validar_no_vacio(texto, nombre_campo):
-    
-    if texto.strip() == "":
-        return False, "El campo " + nombre_campo + " no puede estar vacio."
-    return True, ""
+def pedir_texto(mensaje):
+    while True:
+        dato = " ".join(input(mensaje).strip().split())
+
+        if dato:
+            return dato
+
+        print("Este campo no puede estar vacio.")
 
 
-def validar_dni(dni):
-    dni = dni.strip()
-    if dni == "":
-        return False, "El DNI no puede estar vacio."
-    
-    if not dni.isdigit():
-        return False, "El DNI solo debe tener numeros."
-    if len(dni) != 8:
-        return False, "El DNI debe tener exactamente 8 digitos."
-    return True, ""
+def validar_dni():
+    while True:
+        dni = input("DNI (8 digitos): ").strip()
 
-def validar_solo_numeros(texto, nombre_campo):
-    texto = texto.strip()
-    if texto == "":
-        return False, "El campo " + nombre_campo + " no puede estar vacio."
-    if not texto.isdigit():
-        return False, "El campo " + nombre_campo + " solo acepta numeros."
-    return True, ""
+        if not dni:
+            print("El DNI no puede estar vacio.")
+        elif not dni.isdigit():
+            print("El DNI solo debe tener numeros.")
+        if len(dni) != 8:
+            print("El DNI debe tener exactamente 8 digitos.")
+        else:
+             return dni
 
+def pedir_entero(mensaje, minimo, maximo):
+    while True:
+        texto = input(mensaje).strip()
 
-def validar_fecha_nacimiento(fecha):
-    fecha = fecha.strip()
-    if fecha == "":
-        return False, "La fecha de nacimiento no puede estar vacia."
+        if texto == "":
+            print("El campo no puede estar vacio.")
+            continue
 
-  
-    try:
-        fecha_convertida = datetime.strptime(fecha, "%d/%m/%Y")
-    except ValueError:
-        return False, "Fecha invalida. Usa el formato DD/MM/AAAA (ejemplo: 15/03/2010)."
+        if not texto.isdigit():
+            print("El campo solo acepta numeros.")
+            continue
 
-    hoy = datetime.now()
+        numero = int(texto)
 
-   
-    if fecha_convertida > hoy:
-        return False, "La fecha de nacimiento no puede ser futura."
-
-    
-    edad = hoy.year - fecha_convertida.year
-    if edad < 3 or edad > 25:
-        return False, "La edad debe estar entre 3 y 25 anios para un estudiante."
-
-    return True, ""
+        if minimo <= numero <= maximo:
+            return numero
+        print(f"El numero debe estar entre {minimo} y {maximo}.")
 
 
-def validar_nota(nota):
-    nota = nota.strip()
-    if nota == "":
-        return False, "La nota no puede estar vacia."
 
-    
-    try:
-        valor = float(nota)
-    except ValueError:
-        return False, "La nota debe ser un numero."
 
-    if valor < 0 or valor > 20:
-        return False, "La nota debe estar entre 0 y 20."
-    return True, ""
+def pedir_fecha():
+    while True:
+        fecha = input("Fecha de nacimiento (DD/MM/AAAA): ").strip()
+
+        if not fecha:
+            print("La fecha de nacimiento no puede estar vacia.")
+            continue
+
+        try:
+            fecha_validada = datetime.strptime(fecha, "%d/%m/%Y")
+        except ValueError:
+            print("Fecha invalida. Usa el formato DD/MM/AAAA (ejemplo: 15/03/2010).")
+            continue
+
+        hoy = datetime.now()
+
+        if fecha_validada > hoy:
+            print("La fecha de nacimiento no puede ser futura.")
+            continue
+
+        edad = hoy.year - fecha_validada.year
+
+        if (hoy.month, hoy.day) < (fecha_validada.month, fecha_validada.day):
+            edad -= 1
+
+        if edad < 3 or edad > 25:
+            print("La edad debe estar entre 3 y 25 anios para un estudiante.")
+            continue
+
+        return fecha
+
+
+
+
+
+def pedir_nota():
+    while True:
+        dato = input("Nota (0 a 20): ").strip()
+
+        if not dato:
+            print("La nota no puede estar vacia.")
+            continue
+
+        try:
+            nota = float(dato.replace(",", "."))
+        except ValueError:
+            print("La nota debe ser un numero.")
+            continue
+
+        if not 0 <= nota <= 20:
+            print("La nota debe estar entre 0 y 20.")
+            continue
+
+        return nota
 
 
 # 6. Validar el telefono del apoderado
 # En Peru los celulares tienen 9 digitos y empiezan con 9
-def validar_telefono_apoderado(telefono):
-    telefono = telefono.strip()
-    if telefono == "":
-        return False, "El telefono del apoderado no puede estar vacio."
-    if not telefono.isdigit():
-        return False, "El telefono solo debe tener numeros."
-    if len(telefono) != 9:
-        return False, "El telefono debe tener 9 digitos."
-    if telefono[0] != "9":
-        return False, "El telefono debe empezar con 9."
-    return True, ""
-
-
-# Esta funcion le pide un dato al estudiante por la terminal.
-# Si el dato esta mal, muestra el error y se lo vuelve a pedir
-# hasta que lo escriba bien (eso es el while True).
-def pedir_dato(mensaje, funcion_validar):
+def pedir_telefono():
     while True:
-        dato = input(mensaje)
-        es_valido, error = funcion_validar(dato)
-        if es_valido:
-            print("   -> Dato valido\n")
-            return dato.strip()
-        print("   -> ERROR: " + error + "\n")
+        telefono = input("Telefono del apoderado: ").strip()
 
-
-# Programa de prueba: solo corre si ejecutas este archivo directamente
-# (si otro archivo lo importa, esto NO se ejecuta)
-if __name__ == "__main__":
-    print("=== REGISTRO DE ESTUDIANTE ===\n")
-
-    nombre = pedir_dato("Nombre completo: ", lambda x: validar_no_vacio(x, "nombre"))
-    dni = pedir_dato("DNI (8 digitos): ", validar_dni)
-    fecha = pedir_dato("Fecha de nacimiento (DD/MM/AAAA): ", validar_fecha_nacimiento)
-    nota = pedir_dato("Nota (0 a 20): ", validar_nota)
-    telefono = pedir_dato("Telefono del apoderado (9 digitos): ", validar_telefono_apoderado)
-
-    print("=== DATOS REGISTRADOS CORRECTAMENTE ===")
-    print("Nombre:", nombre)
-    print("DNI:", dni)
-    print("Fecha de nacimiento:", fecha)
-    print("Nota:", nota)
-    print("Telefono del apoderado:", telefono)
+        if not telefono:
+            print("El telefono del apoderado no puede estar vacio.")
+        elif not telefono.isdigit():
+            print("El telefono solo debe tener numeros.")
+        elif len(telefono) != 9:
+            print("El telefono debe tener 9 digitos.")
+        elif not telefono.startswith("9"):
+            print("El telefono debe empezar con 9.")
+        else:
+            return telefono
