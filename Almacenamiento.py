@@ -24,3 +24,22 @@ def cargar_estudiantes():
         raise ValueError("El contenido de estudiantes.json debe ser una lista.")
 
     return datos
+
+def guardar_estudiantes(estudiantes):
+    """Guarda la lista completa usando un archivo temporal."""
+    if not isinstance(estudiantes, list):
+        raise TypeError("Los estudiantes deben estar organizados en una lista.")
+
+    temporal=ARCHIVO.with_name(ARCHIVO.name + ".tmp")
+
+    try:
+        with open(temporal, "w", encoding="utf-8") as archivo:
+            json.dump(estudiantes, archivo, ensure_ascii=False, indent=4)
+            archivo.flush()
+
+        temporal.replace(ARCHIVO)
+    except OSError:
+        if temporal.exists():
+            temporal.unlink()
+        raise
+    
