@@ -1,30 +1,33 @@
- 
+
 import json
-import os
 from pathlib import Path
 from datetime import datetime
 
 ARCHIVO = Path(__file__).resolve().parent / "estudiantes.json"
 
 
+# Cargar y guardar estudiantes
 def cargar_estudiantes():
-    if not os.path.exists(ARCHIVO):
+    if not ARCHIVO.exists():
         return []
 
     try:
-        with open(ARCHIVO, "r", encoding="utf-8") as f:
-            datos = json.load(f)
-            return datos if isinstance(datos, list) else []
+        with open(ARCHIVO, "r", encoding="utf-8") as archivo:
+            datos = json.load(archivo)
+
+        return datos if isinstance(datos, list) else []
+
     except (json.JSONDecodeError, OSError):
         print("No se pudo leer el archivo de datos.")
         return []
 
 
 def guardar_estudiantes(estudiantes):
-    with open(ARCHIVO, "w", encoding="utf-8") as f:
-        json.dump(estudiantes, f, ensure_ascii=False, indent=4)
+    with open(ARCHIVO, "w", encoding="utf-8") as archivo:
+        json.dump(estudiantes, archivo, ensure_ascii=False, indent=4)
 
 
+# Validar datos
 def pedir_texto(mensaje):
     while True:
         dato = " ".join(input(mensaje).strip().split())
@@ -56,7 +59,7 @@ def pedir_entero(mensaje, minimo, maximo):
         except ValueError:
             pass
 
-        print(f"Ingrese un entero entre {minimo} y {maximo}.")
+        print(f"Ingrese un numero entre {minimo} y {maximo}.")
 
 
 def pedir_fecha():
@@ -64,13 +67,33 @@ def pedir_fecha():
         fecha = input("Fecha de nacimiento (DD/MM/AAAA): ").strip()
 
         try:
-            datetime.strptime(fecha, "%d/%m/%Y")
+            fecha_validada = datetime.strptime(fecha, "%d/%m/%Y")
+
+            if fecha_validada.date() > datetime.now().date():
+                print("La fecha no puede ser futura.")
+                continue
+
             return fecha
 
         except ValueError:
             print("Fecha invalida. Use DD/MM/AAAA.")
 
 
+def pedir_nota():
+    while True:
+        try:
+            nota = float(input("Nota (0 a 20): ").strip().replace(",", "."))
+
+            if 0 <= nota <= 20:
+                return nota
+
+        except ValueError:
+            pass
+
+        print("La nota debe estar entre 0 y 20.")
+
+
+# Buscar estudiante mediante recursividad
 def buscar_recursivo(estudiantes, dni, indice=0):
     if indice >= len(estudiantes):
         return None
@@ -81,15 +104,16 @@ def buscar_recursivo(estudiantes, dni, indice=0):
     return buscar_recursivo(estudiantes, dni, indice + 1)
 
 
+# Matricula de estudiantes
 def matricular():
     estudiantes = cargar_estudiantes()
 
-    print("\n=== MATRICULA DE ESTUDIANTES ===")
+    print("\nMATRICULA DE ESTUDIANTES")
 
     dni = pedir_dni()
 
     if buscar_recursivo(estudiantes, dni):
-        print("Ese DNI ya esta matriculado. No se permiten duplicados.")
+        print("Ese DNI ya esta registrado.")
         return
 
     nombres = pedir_texto("Nombres: ").title()
@@ -105,10 +129,10 @@ def matricular():
     while True:
         telefono = input("Telefono del apoderado: ").strip()
 
-        if telefono.isdigit() and 7 <= len(telefono) <= 15:
+        if telefono.isdigit() and len(telefono) == 9 and telefono.startswith("9"):
             break
 
-        print("Ingrese un telefono numerico de 7 a 15 digitos.")
+        print("Ingrese un telefono de 9 digitos que empiece con 9.")
 
     estudiante = {
         "dni": dni,
@@ -128,11 +152,19 @@ def matricular():
     estudiantes.append(estudiante)
     guardar_estudiantes(estudiantes)
 
-    print("Matricula registrada correctamente.")
-def trasladar():
+    print("\nMatricula registrada correctamente.")
+    print("Estudiante:", nombres, apellidos)
+
+
+# Registro de notas
+def registrar_nota():
     estudiantes = cargar_estudiantes()
 
-    print("\n=== TRASLADO DE ESTUDIANTE ===")
+    print("\nREGISTRO DE NOTAS")
+
+    if not estudiantes:
+        print("No hay estudiantes registrados.")
+        return
 
     dni = pedir_dni()
     estudiante = buscar_recursivo(estudiantes, dni)
@@ -141,8 +173,61 @@ def trasladar():
         print("No se encontro al estudiante.")
         return
 
-    if estudiante["estado"] != "Matriculado":
-        print("El estudiante no se encuentra matriculado.")
+    if estudiante.get("estado") != "Matriculado":
+        print("El estudiante no esta matriculado.")
+        return
+
+    print("\nEstudiante:", estudiante["nombres"], estudiante["apellidos"])
+
+    curso = pedir_texto("Nombre del curso: ").title()
+    bimestre = pedir_entero("Bimestre (1 a 4): ", 1, 4)
+
+    notas = estudiante.setdefault("notas", [])
+
+    for registro in notas:
+        if (
+            registro["curso"].casefold() == curso.casefold()
+            and registro["bimestre"] == bimestre
+        ):
+            print("Ya existe una nota para ese curso y bimestre.")
+            return
+
+    nota = pedir_nota()
+
+    registro = {
+        "curso": curso,
+        "bimestre": bimestre,
+        "nota": nota
+    }
+
+    notas.append(registro)
+    guardar_estudiantes(estudiantes)
+
+    print("\nNota registrada correctamente.")
+    print("Curso:", curso)
+    print("Bimestre:", bimestre)
+    print("Nota:", nota)
+
+
+# Traslado de estudiantes
+def trasladar():
+    estudiantes = cargar_estudiantes()
+
+    print("\nTRASLADO DE ESTUDIANTES")
+
+    if not estudiantes:
+        print("No hay estudiantes registrados.")
+        return
+
+    dni = pedir_dni()
+    estudiante = buscar_recursivo(estudiantes, dni)
+
+    if estudiante is None:
+        print("No se encontro al estudiante.")
+        return
+
+    if estudiante.get("estado") != "Matriculado":
+        print("El estudiante no esta matriculado.")
         return
 
     print("\nDatos del estudiante:")
@@ -161,7 +246,7 @@ def trasladar():
         "estado_nuevo": "Trasladado"
     }
 
-    estudiante["traslados"].append(registro)
+    estudiante.setdefault("traslados", []).append(registro)
     estudiante["estado"] = "Trasladado"
 
     guardar_estudiantes(estudiantes)
@@ -169,6 +254,4 @@ def trasladar():
     print("\nTraslado registrado correctamente.")
     print("Destino:", destino)
     print("Fecha:", fecha)
-    print("Estado actualizado a: Trasladado")
-if __name__ == "__main__":
-    matricular()
+    print("Estado actualizado: Trasladado")
