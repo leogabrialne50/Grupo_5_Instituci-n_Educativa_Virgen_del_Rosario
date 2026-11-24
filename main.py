@@ -1,5 +1,5 @@
-from operaciones import matricular, registrar_nota, trasladar
-from consultas import buscar, ver_notas, listar, ordenar, resumen
+from Operaciones import matricular, registrar_nota, trasladar
+from Consultas import buscar, ver_notas, listar, ordenar, resumen
 
 
 def menu():
