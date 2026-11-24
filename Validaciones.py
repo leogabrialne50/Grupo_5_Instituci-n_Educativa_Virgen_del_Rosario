@@ -1,7 +1,6 @@
 from datetime import datetime
 
 
-
 def pedir_texto(mensaje):
     while True:
         dato = " ".join(input(mensaje).strip().split())
@@ -20,10 +19,15 @@ def validar_dni():
             print("El DNI no puede estar vacio.")
         elif not dni.isdigit():
             print("El DNI solo debe tener numeros.")
-        if len(dni) != 8:
+        elif len(dni) != 8:
             print("El DNI debe tener exactamente 8 digitos.")
         else:
-             return dni
+            return dni
+
+
+# Alias para compatibilidad con archivos que importen 'pedir_dni'
+pedir_dni = validar_dni
+
 
 def pedir_entero(mensaje, minimo, maximo):
     while True:
@@ -42,8 +46,6 @@ def pedir_entero(mensaje, minimo, maximo):
         if minimo <= numero <= maximo:
             return numero
         print(f"El numero debe estar entre {minimo} y {maximo}.")
-
-
 
 
 def pedir_fecha():
@@ -76,9 +78,6 @@ def pedir_fecha():
             continue
 
         return fecha
-
-
-
 
 
 def pedir_nota():
