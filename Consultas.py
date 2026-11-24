@@ -1,5 +1,5 @@
-from almacenamiento import cargar_estudiantes, guardar_estudiantes
-from validaciones import pedir_dni
+from Almacenamiento import cargar_estudiantes, guardar_estudiantes
+from Validaciones import pedir_dni
 
 
 def buscar_recursivo(estudiantes, dni, indice=0):
